@@ -55,6 +55,24 @@ class ProblemaResolver:
         self.numeros_aleatorios = []
         self.metodo_normal = None
         
+
+    def normal_type_selection(self):
+        metodo = simpledialog.askstring(
+                        "Método para Distribución Normal",
+                        "Seleccione el método para generar números normales:\n\n" +
+                        "1. Método de 12 números aleatorios\n" +
+                        "2. Método Box-Muller\n\n" +
+                        "Ingrese el número:"
+                    )
+                    
+        if metodo == "1":
+                        self.metodo_normal = "12_numeros"
+        elif metodo == "2":
+                        self.metodo_normal = "box_muller"
+        else:
+                        messagebox.showerror("Error", "Método inválido")
+                        return False  
+
     def seleccionar_distribucion(self):
         """Paso 1: Seleccionar la distribución a usar"""
         distribuciones = [
@@ -86,21 +104,7 @@ class ProblemaResolver:
                 
                 # Si es Normal, preguntar por el método
                 if self.distribucion == "Normal":
-                    metodo = simpledialog.askstring(
-                        "Método para Distribución Normal",
-                        "Seleccione el método para generar números normales:\n\n" +
-                        "1. Método de 12 números aleatorios\n" +
-                        "2. Método Box-Muller\n\n" +
-                        "Ingrese el número:"
-                    )
-                    
-                    if metodo == "1":
-                        self.metodo_normal = "12_numeros"
-                    elif metodo == "2":
-                        self.metodo_normal = "box_muller"
-                    else:
-                        messagebox.showerror("Error", "Método inválido")
-                        return False
+                    self.normal_type_selection()
                 
                 return True
         except:
@@ -156,53 +160,58 @@ class ProblemaResolver:
         return False
 
     def generar_numeros_aleatorios(self):
+        # Configuración automática del generador
+                self.generador.generar_parametros_aleatorios()
+                
+                cantidad = simpledialog.askinteger(
+                    "Cantidad de Números",
+                    "¿Cuántos números aleatorios desea generar?",
+                    initialvalue=100,
+                    minvalue=10,
+                    maxvalue=10000
+                )
+                
+                if cantidad is None:
+                    return False
+                
+                self.numeros_aleatorios = self.generador.generar_numeros(cantidad)
+                
+                messagebox.showinfo(
+                    "Generación Completada",
+                    f"Se generaron {cantidad} números aleatorios\n"
+                    f"Parámetros usados:\n"
+                    f"a={self.generador.a}, c={self.generador.c}, m={self.generador.m}, X₀={self.generador.x0}"
+                )
+                
+                self.mostrar_numeros_generados()
+    def numbers_source_selection(self):
         """Paso 3: Generar o cargar números aleatorios"""
         root = tk.Tk()
         root.withdraw()
         
-        # Preguntar si usar generador automático
-        usar_generador = messagebox.askyesno(
-            "Generador de Números Aleatorios",
-            "¿Desea usar el generador congruencial mixto para generar números aleatorios?\n\n"
-            "Sí: Se generarán números automáticamente\n"
-            "No: Podrá cargar números desde un archivo Excel"
+        numbers_source = simpledialog.askstring(
+            "Generación de Números Aleatorios",
+            "1. Generar Números Aleatorios con Congruencial Mixto\n"+
+            "2. Cargar Números Aleatorios desde Excel\n\nIngrese el opción:"
         )
-        
-        if usar_generador:
-            # Configuración automática del generador
-            self.generador.generar_parametros_aleatorios()
+
+        if not numbers_source:
+            return False
+        try:
+            if numbers_source == "1":
+                self.generar_numeros_aleatorios()
+                
+            elif numbers_source == "2":
+                # Cargar desde Excel
+                if not self.cargar_numeros_excel():
+                    return False
             
-            # Pedir cantidad de números a generar
-            cantidad = simpledialog.askinteger(
-                "Cantidad de Números",
-                "¿Cuántos números aleatorios desea generar?",
-                initialvalue=100,
-                minvalue=10,
-                maxvalue=10000
-            )
-            
-            if cantidad is None:
+            else:
+                messagebox.showerror("Error", "Opción inválida")
                 return False
-            
-            # Generar números
-            self.numeros_aleatorios = self.generador.generar_numeros(cantidad)
-            
-            messagebox.showinfo(
-                "Generación Completada",
-                f"Se generaron {cantidad} números aleatorios\n"
-                f"Parámetros usados:\n"
-                f"a={self.generador.a}, c={self.generador.c}, m={self.generador.m}, X₀={self.generador.x0}"
-            )
-            
-            # Mostrar números generados
-            self.mostrar_numeros_generados()
-            
-        else:
-            # Cargar desde Excel
-            if not self.cargar_numeros_excel():
-                return False
-        
-        return True
+            return True
+        except:
+            pass
 
     def mostrar_numeros_generados(self):
         """Muestra los números aleatorios generados en una ventana"""
@@ -219,9 +228,9 @@ class ProblemaResolver:
         frame_controles.pack(pady=10)
         
         tk.Button(frame_controles, text="Exportar a Excel", 
-                 command=self.exportar_numeros_excel).pack(side=tk.LEFT, padx=5)
+                command=self.exportar_numeros_excel).pack(side=tk.LEFT, padx=5)
         tk.Button(frame_controles, text="Cerrar", 
-                 command=ventana_numeros.destroy).pack(side=tk.LEFT, padx=5)
+                command=ventana_numeros.destroy).pack(side=tk.LEFT, padx=5)
         
         # Texto con scroll
         frame_texto = tk.Frame(ventana_numeros)
@@ -785,7 +794,7 @@ def main():
         return
     
     # Paso 3: Generar o cargar números aleatorios
-    if not resolver.generar_numeros_aleatorios():
+    if not resolver.numbers_source_selection():
         return
     
     # Paso 4: Seleccionar tipos de preguntas
