@@ -47,6 +47,16 @@ class congruencial_cuadratico_generator(congruencial_generator):
     def calculate_next_number(self, actual_number):
         return (self.a*(self.seed**2)+self.b*self.seed+self.c)%self.module
 
+class bbs_generator(congruencial_generator):
+    def __init__(self, seed, p, q):
+        super().__init__(seed, p*q, 1)
+        self.numbers = []
+        self.normalized_numbers = []
+
+    #x^2 % m
+    def calculate_next_number(self, actual_number):
+        return (actual_number**2)%self.module
+
 def aditivo(parameters, k,m):
     numbers = parameters
     for i in range(0,m-1):
@@ -54,23 +64,3 @@ def aditivo(parameters, k,m):
         numbers.append(new_number)
     numbers = get_normalized_numbers(numbers,m)
     return numbers
-
-def bbs(seed,p,q):
-    module = p*q
-    numbers = []
-    first_number = (seed**2)%module
-    actual_number = first_number
-    numbers.append(actual_number)
-    while True:
-        actual_number= (actual_number**2)%module
-        if(actual_number == first_number):
-            break
-        numbers.append(actual_number)
-    numbers = get_normalized_numbers(numbers,module)
-    return numbers
-
-def get_normalized_numbers(numbers,module):
-    normalized_numbers = []
-    for num in numbers:
-        normalized_numbers.append(num/module)
-    return normalized_numbers
