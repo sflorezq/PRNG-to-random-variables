@@ -57,10 +57,15 @@ class bbs_generator(congruencial_generator):
     def calculate_next_number(self, actual_number):
         return (actual_number**2)%self.module
 
-def aditivo(parameters, k,m):
-    numbers = parameters
-    for i in range(0,m-1):
-        new_number = (numbers[i]+numbers[k+i])%m
-        numbers.append(new_number)
-    numbers = get_normalized_numbers(numbers,m)
-    return numbers
+class additive_generator(congruencial_generator):
+    def __init__(self, parameters, k,module):
+        super().__init__(parameters[0], module, 1)
+        self.parameters = parameters
+        self.k = k
+
+    def generate_numbers(self):
+        self.numbers = self.parameters
+        for i in range(0,self.module-1):
+            next_number = (self.numbers[i]+self.numbers[self.k+i])%self.module
+            self.numbers.append(next_number)
+        return self.numbers
