@@ -5,6 +5,14 @@ class congruencial_generator:
         self.module = module
         self.multiplicative = multiplicative
         self.numbers = []
+        self.normalized_numbers = []
+
+    def get_normalized_numbers(self):
+        if not self.numbers:
+            self.generate_numbers()
+        if not self.normalized_numbers:
+            self.normalized_numbers = [num / self.module for num in self.numbers]
+        return self.normalized_numbers
 
     def calculate_next_number(self, actual_number):
         return (self.multiplicative*actual_number)%self.module
