@@ -57,6 +57,7 @@ class bbs_generator(congruencial_generator):
     def calculate_next_number(self, actual_number):
         return (actual_number**2)%self.module
 
+#n1 + nk | n2 + nk+1 | n... + nk... 
 class additive_generator(congruencial_generator):
     def __init__(self, parameters, k,module):
         super().__init__(parameters[0], module, 1)

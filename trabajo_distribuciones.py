@@ -344,6 +344,32 @@ class ProblemaResolver:
                 "parametro": "Ninguno"
             }
         ]
+        ''' opcion = simpledialog.askstring(
+            "Seleccionar Preguntas",
+            "Ingrese el número correspondiente al tipo de pregunta que desea resolver:\n1. P(X < a)\n2. P(a < X < b)\n3. P(X > a)\n\n Ingrese el número (puede seleccionar varias separadas por una coma): "
+        )
+        opcion = split
+        #convertir opcion en un arreglo para poder seleccionar varias opciones
+        if not opcion:
+            return False
+        try:
+            if opcion == "1":
+                pass
+            #realizar pregunta del valor a evaluar para P(X < a)
+                
+            elif opcion == "2":
+                pass
+                
+            elif opcion == "3":
+                pass
+                
+            
+            else:
+                messagebox.showerror("Error", "Opción inválida")
+                return False
+
+        except:
+            pass'''
         
         for tipo_pregunta in tipos_preguntas:
             respuesta = messagebox.askyesno(
